@@ -1,493 +1,542 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Quiz — O que você sabe sobre IA?</title>
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz — O que você sabe sobre IA?</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-  :root {
-    --bg: #ffffff;
-    --bg-2: #f7f6f3;
-    --bg-3: #eeece8;
-    --text: #1a1a18;
-    --text-2: #5a5a56;
-    --text-3: #9a9a94;
-    --border: rgba(0,0,0,0.10);
-    --border-2: rgba(0,0,0,0.16);
-    --correct-bg: #E1F5EE;
-    --correct-border: #5DCAA5;
-    --correct-text: #0F6E56;
-    --wrong-bg: #FCEBEB;
-    --wrong-border: #F09595;
-    --wrong-text: #A32D2D;
-    --neutral-bg: #EEEDFE;
-    --neutral-border: #AFA9EC;
-    --neutral-text: #3C3489;
-    --accent: #534AB7;
-    --radius: 12px;
-    --radius-sm: 8px;
-    --radius-pill: 999px;
-  }
+      :root {
+        --bg: #ffffff;
+        --bg-2: #f7f6f3;
+        --bg-3: #eeece8;
+        --text: #1a1a18;
+        --text-2: #5a5a56;
+        --text-3: #9a9a94;
+        --border: rgba(0, 0, 0, 0.1);
+        --border-2: rgba(0, 0, 0, 0.16);
+        --correct-bg: #e1f5ee;
+        --correct-border: #5dcaa5;
+        --correct-text: #0f6e56;
+        --wrong-bg: #fcebeb;
+        --wrong-border: #f09595;
+        --wrong-text: #a32d2d;
+        --neutral-bg: #eeedfe;
+        --neutral-border: #afa9ec;
+        --neutral-text: #3c3489;
+        --accent: #534ab7;
+        --radius: 12px;
+        --radius-sm: 8px;
+        --radius-pill: 999px;
+      }
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #1c1c1a;
-      --bg-2: #242420;
-      --bg-3: #2c2c28;
-      --text: #f0ede8;
-      --text-2: #a0a09a;
-      --text-3: #606060;
-      --border: rgba(255,255,255,0.09);
-      --border-2: rgba(255,255,255,0.15);
-      --correct-bg: #04342C;
-      --correct-border: #1D9E75;
-      --correct-text: #9FE1CB;
-      --wrong-bg: #501313;
-      --wrong-border: #E24B4A;
-      --wrong-text: #F7C1C1;
-      --neutral-bg: #26215C;
-      --neutral-border: #7F77DD;
-      --neutral-text: #CECBF6;
-      --accent: #7F77DD;
-    }
-  }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #1c1c1a;
+          --bg-2: #242420;
+          --bg-3: #2c2c28;
+          --text: #f0ede8;
+          --text-2: #a0a09a;
+          --text-3: #606060;
+          --border: rgba(255, 255, 255, 0.09);
+          --border-2: rgba(255, 255, 255, 0.15);
+          --correct-bg: #04342c;
+          --correct-border: #1d9e75;
+          --correct-text: #9fe1cb;
+          --wrong-bg: #501313;
+          --wrong-border: #e24b4a;
+          --wrong-text: #f7c1c1;
+          --neutral-bg: #26215c;
+          --neutral-border: #7f77dd;
+          --neutral-text: #cecbf6;
+          --accent: #7f77dd;
+        }
+      }
 
-  body {
-    font-family: 'Georgia', 'Times New Roman', serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 2rem 1rem 3rem;
-  }
+      body {
+        font-family: "Georgia", "Times New Roman", serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 2rem 1rem 3rem;
+      }
 
-  .container {
-    width: 100%;
-    max-width: 580px;
-  }
+      .container {
+        width: 100%;
+        max-width: 580px;
+      }
 
-  /* Header */
-  .header {
-    margin-bottom: 2rem;
-    padding-bottom: 1.25rem;
-    border-bottom: 0.5px solid var(--border-2);
-  }
+      /* Header */
+      .header {
+        margin-bottom: 2rem;
+        padding-bottom: 1.25rem;
+        border-bottom: 0.5px solid var(--border-2);
+      }
 
-  .eyebrow {
-    font-family: 'Courier New', monospace;
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 6px;
-    display: block;
-  }
+      .eyebrow {
+        font-family: "Courier New", monospace;
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 6px;
+        display: block;
+      }
 
-  .header h1 {
-    font-size: 22px;
-    font-weight: 400;
-    color: var(--text);
-    line-height: 1.3;
-    margin-bottom: 6px;
-  }
+      .header h1 {
+        font-size: 22px;
+        font-weight: 400;
+        color: var(--text);
+        line-height: 1.3;
+        margin-bottom: 6px;
+      }
 
-  .header p {
-    font-size: 14px;
-    color: var(--text-2);
-    font-style: italic;
-    line-height: 1.5;
-  }
+      .header p {
+        font-size: 14px;
+        color: var(--text-2);
+        font-style: italic;
+        line-height: 1.5;
+      }
 
-  /* Progress */
-  .progress-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 1.75rem;
-  }
+      /* Progress */
+      .progress-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 1.75rem;
+      }
 
-  .progress-track {
-    flex: 1;
-    height: 4px;
-    background: var(--bg-3);
-    border-radius: 2px;
-    overflow: hidden;
-  }
+      .progress-track {
+        flex: 1;
+        height: 4px;
+        background: var(--bg-3);
+        border-radius: 2px;
+        overflow: hidden;
+      }
 
-  .progress-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 2px;
-    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
-    width: 0%;
-  }
+      .progress-fill {
+        height: 100%;
+        background: var(--accent);
+        border-radius: 2px;
+        transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        width: 0%;
+      }
 
-  .progress-label {
-    font-family: 'Courier New', monospace;
-    font-size: 11px;
-    color: var(--text-3);
-    white-space: nowrap;
-  }
+      .progress-label {
+        font-family: "Courier New", monospace;
+        font-size: 11px;
+        color: var(--text-3);
+        white-space: nowrap;
+      }
 
-  /* Question card */
-  .question-card {
-    background: var(--bg);
-    border: 0.5px solid var(--border-2);
-    border-radius: var(--radius);
-    padding: 1.5rem 1.5rem 1.25rem;
-    margin-bottom: 1rem;
-    animation: slideIn 0.3s ease;
-  }
+      /* Question card */
+      .question-card {
+        background: var(--bg);
+        border: 0.5px solid var(--border-2);
+        border-radius: var(--radius);
+        padding: 1.5rem 1.5rem 1.25rem;
+        margin-bottom: 1rem;
+        animation: slideIn 0.3s ease;
+      }
 
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-  .q-number {
-    font-family: 'Courier New', monospace;
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-3);
-    margin-bottom: 10px;
-    display: block;
-  }
+      .q-number {
+        font-family: "Courier New", monospace;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-3);
+        margin-bottom: 10px;
+        display: block;
+      }
 
-  .q-text {
-    font-size: 17px;
-    line-height: 1.55;
-    color: var(--text);
-    margin-bottom: 1.25rem;
-    font-weight: 400;
-  }
+      .q-text {
+        font-size: 17px;
+        line-height: 1.55;
+        color: var(--text);
+        margin-bottom: 1.25rem;
+        font-weight: 400;
+      }
 
-  /* Options */
-  .options { display: flex; flex-direction: column; gap: 8px; }
+      /* Options */
+      .options {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
 
-  .option {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 14px;
-    border: 0.5px solid var(--border-2);
-    border-radius: var(--radius-sm);
-    background: var(--bg-2);
-    cursor: pointer;
-    transition: border-color 0.15s, background 0.15s, transform 0.1s;
-    text-align: left;
-    width: 100%;
-    font-family: 'Georgia', serif;
-  }
+      .option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border: 0.5px solid var(--border-2);
+        border-radius: var(--radius-sm);
+        background: var(--bg-2);
+        cursor: pointer;
+        transition:
+          border-color 0.15s,
+          background 0.15s,
+          transform 0.1s;
+        text-align: left;
+        width: 100%;
+        font-family: "Georgia", serif;
+      }
 
-  .option:hover:not(:disabled) {
-    border-color: var(--accent);
-    background: var(--neutral-bg);
-  }
+      .option:hover:not(:disabled) {
+        border-color: var(--accent);
+        background: var(--neutral-bg);
+      }
 
-  .option:active:not(:disabled) { transform: scale(0.99); }
+      .option:active:not(:disabled) {
+        transform: scale(0.99);
+      }
 
-  .option:disabled { cursor: default; }
+      .option:disabled {
+        cursor: default;
+      }
 
-  .option.correct {
-    background: var(--correct-bg);
-    border-color: var(--correct-border);
-  }
+      .option.correct {
+        background: var(--correct-bg);
+        border-color: var(--correct-border);
+      }
 
-  .option.wrong {
-    background: var(--wrong-bg);
-    border-color: var(--wrong-border);
-  }
+      .option.wrong {
+        background: var(--wrong-bg);
+        border-color: var(--wrong-border);
+      }
 
-  .option.dimmed {
-    opacity: 0.45;
-  }
+      .option.dimmed {
+        opacity: 0.45;
+      }
 
-  .opt-letter {
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
-    font-weight: 400;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: var(--bg-3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: background 0.15s, color 0.15s;
-    color: var(--text-2);
-  }
+      .opt-letter {
+        font-family: "Courier New", monospace;
+        font-size: 12px;
+        font-weight: 400;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--bg-3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition:
+          background 0.15s,
+          color 0.15s;
+        color: var(--text-2);
+      }
 
-  .option.correct .opt-letter {
-    background: var(--correct-border);
-    color: var(--correct-bg);
-  }
+      .option.correct .opt-letter {
+        background: var(--correct-border);
+        color: var(--correct-bg);
+      }
 
-  .option.wrong .opt-letter {
-    background: var(--wrong-border);
-    color: var(--wrong-bg);
-  }
+      .option.wrong .opt-letter {
+        background: var(--wrong-border);
+        color: var(--wrong-bg);
+      }
 
-  .opt-text {
-    font-size: 15px;
-    color: var(--text);
-    line-height: 1.45;
-  }
+      .opt-text {
+        font-size: 15px;
+        color: var(--text);
+        line-height: 1.45;
+      }
 
-  .option.correct .opt-text { color: var(--correct-text); }
-  .option.wrong .opt-text   { color: var(--wrong-text); }
+      .option.correct .opt-text {
+        color: var(--correct-text);
+      }
+      .option.wrong .opt-text {
+        color: var(--wrong-text);
+      }
 
-  .opt-icon {
-    margin-left: auto;
-    font-size: 16px;
-    flex-shrink: 0;
-  }
+      .opt-icon {
+        margin-left: auto;
+        font-size: 16px;
+        flex-shrink: 0;
+      }
 
-  /* Feedback */
-  .feedback {
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-    font-size: 14px;
-    line-height: 1.6;
-    margin-top: 10px;
-    display: none;
-    animation: fadeIn 0.25s ease;
-  }
+      /* Feedback */
+      .feedback {
+        border-radius: var(--radius-sm);
+        padding: 12px 14px;
+        font-size: 14px;
+        line-height: 1.6;
+        margin-top: 10px;
+        display: none;
+        animation: fadeIn 0.25s ease;
+      }
 
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
 
-  .feedback.correct {
-    background: var(--correct-bg);
-    border: 0.5px solid var(--correct-border);
-    color: var(--correct-text);
-    display: block;
-  }
+      .feedback.correct {
+        background: var(--correct-bg);
+        border: 0.5px solid var(--correct-border);
+        color: var(--correct-text);
+        display: block;
+      }
 
-  .feedback.wrong {
-    background: var(--wrong-bg);
-    border: 0.5px solid var(--wrong-border);
-    color: var(--wrong-text);
-    display: block;
-  }
+      .feedback.wrong {
+        background: var(--wrong-bg);
+        border: 0.5px solid var(--wrong-border);
+        color: var(--wrong-text);
+        display: block;
+      }
 
-  .feedback-icon { font-size: 15px; margin-right: 6px; }
+      .feedback-icon {
+        font-size: 15px;
+        margin-right: 6px;
+      }
 
-  /* Next button */
-  .next-btn {
-    display: none;
-    width: 100%;
-    margin-top: 0.75rem;
-    padding: 12px;
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-    letter-spacing: 0.06em;
-    color: var(--bg);
-    background: var(--accent);
-    border: none;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s;
-    text-align: center;
-  }
+      /* Next button */
+      .next-btn {
+        display: none;
+        width: 100%;
+        margin-top: 0.75rem;
+        padding: 12px;
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+        letter-spacing: 0.06em;
+        color: var(--bg);
+        background: var(--accent);
+        border: none;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition:
+          opacity 0.15s,
+          transform 0.1s;
+        text-align: center;
+      }
 
-  .next-btn:hover { opacity: 0.88; }
-  .next-btn:active { transform: scale(0.98); }
-  .next-btn.visible { display: block; animation: fadeIn 0.3s ease; }
+      .next-btn:hover {
+        opacity: 0.88;
+      }
+      .next-btn:active {
+        transform: scale(0.98);
+      }
+      .next-btn.visible {
+        display: block;
+        animation: fadeIn 0.3s ease;
+      }
 
-  /* Result */
-  .result {
-    background: var(--bg-2);
-    border: 0.5px solid var(--border-2);
-    border-radius: var(--radius);
-    padding: 2rem 1.5rem;
-    text-align: center;
-    display: none;
-    animation: slideIn 0.4s ease;
-  }
+      /* Result */
+      .result {
+        background: var(--bg-2);
+        border: 0.5px solid var(--border-2);
+        border-radius: var(--radius);
+        padding: 2rem 1.5rem;
+        text-align: center;
+        display: none;
+        animation: slideIn 0.4s ease;
+      }
 
-  .result.visible { display: block; }
+      .result.visible {
+        display: block;
+      }
 
-  .result-score {
-    font-size: 52px;
-    font-weight: 400;
-    color: var(--accent);
-    line-height: 1;
-    margin-bottom: 8px;
-    font-family: 'Georgia', serif;
-  }
+      .result-score {
+        font-size: 52px;
+        font-weight: 400;
+        color: var(--accent);
+        line-height: 1;
+        margin-bottom: 8px;
+        font-family: "Georgia", serif;
+      }
 
-  .result-label {
-    font-family: 'Courier New', monospace;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-3);
-    margin-bottom: 1rem;
-  }
+      .result-label {
+        font-family: "Courier New", monospace;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-3);
+        margin-bottom: 1rem;
+      }
 
-  .result-msg {
-    font-size: 16px;
-    color: var(--text);
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
-    max-width: 340px;
-    margin-left: auto;
-    margin-right: auto;
-  }
+      .result-msg {
+        font-size: 16px;
+        color: var(--text);
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        max-width: 340px;
+        margin-left: auto;
+        margin-right: auto;
+      }
 
-  .result-detail {
-    font-size: 13px;
-    color: var(--text-2);
-    font-style: italic;
-    margin-bottom: 1.5rem;
-    line-height: 1.55;
-  }
+      .result-detail {
+        font-size: 13px;
+        color: var(--text-2);
+        font-style: italic;
+        margin-bottom: 1.5rem;
+        line-height: 1.55;
+      }
 
-  .retry-btn {
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
-    letter-spacing: 0.06em;
-    color: var(--text-2);
-    background: transparent;
-    border: 0.5px solid var(--border-2);
-    border-radius: var(--radius-pill);
-    padding: 8px 20px;
-    cursor: pointer;
-    transition: border-color 0.15s, color 0.15s;
-  }
+      .retry-btn {
+        font-family: "Courier New", monospace;
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        color: var(--text-2);
+        background: transparent;
+        border: 0.5px solid var(--border-2);
+        border-radius: var(--radius-pill);
+        padding: 8px 20px;
+        cursor: pointer;
+        transition:
+          border-color 0.15s,
+          color 0.15s;
+      }
 
-  .retry-btn:hover { border-color: var(--accent); color: var(--accent); }
+      .retry-btn:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
 
-  /* Dots */
-  .dots-row {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    margin-bottom: 1.5rem;
-  }
+      /* Dots */
+      .dots-row {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-bottom: 1.5rem;
+      }
 
-  .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--bg-3);
-    border: 0.5px solid var(--border-2);
-    transition: background 0.3s;
-  }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--bg-3);
+        border: 0.5px solid var(--border-2);
+        transition: background 0.3s;
+      }
 
-  .dot.correct { background: var(--correct-border); }
-  .dot.wrong   { background: var(--wrong-border); }
-</style>
-</head>
-<body>
-<div class="container">
+      .dot.correct {
+        background: var(--correct-border);
+      }
+      .dot.wrong {
+        background: var(--wrong-border);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="progress-row">
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <span class="progress-label" id="progress-label">0 / 3</span>
+      </div>
 
-  <div class="header">
-    <span class="eyebrow">Aula 2 · Quiz rápido</span>
-    <h1>O que você sabe sobre IA?</h1>
-    <p>3 perguntas para fixar o que você aprendeu. Sem pressão.</p>
-  </div>
-
-  <div class="progress-row">
-    <div class="progress-track">
-      <div class="progress-fill" id="progress-fill"></div>
+      <div id="quiz-area"></div>
+      <div class="result" id="result-area"></div>
     </div>
-    <span class="progress-label" id="progress-label">0 / 3</span>
-  </div>
 
-  <div id="quiz-area"></div>
-  <div class="result" id="result-area"></div>
+    <script>
+      const QUESTIONS = [
+        {
+          text: "A IA pode dar respostas diferentes para o mesmo prompt. Isso acontece porque…",
+          options: [
+            "ela aprende com cada conversa",
+            "ela trabalha com probabilidades",
+            "ela tem humor variável",
+          ],
+          correct: 1,
+          feedbacks: [
+            "Não exatamente. A IA não guarda memória entre conversas diferentes — cada sessão começa do zero.",
+            "Isso mesmo! A IA não tem uma resposta certa guardada — ela prevê a próxima palavra com base em probabilidades, e pode seguir caminhos diferentes a cada vez.",
+            "Não — a IA não tem estados emocionais. O que muda é o caminho probabilístico que ela segue ao gerar a resposta.",
+          ],
+        },
+        {
+          text: "Qual dessas afirmações sobre a IA é verdadeira?",
+          options: [
+            "Ela sempre avisa quando erra",
+            "Ela gera respostas com a mesma confiança, certas ou não",
+            "Ela pensa como um humano",
+          ],
+          correct: 1,
+          feedbacks: [
+            "Na verdade, não. A IA não sabe que errou — ela gera a resposta mais provável sem avaliar se está correta.",
+            "Exatamente. A IA responde com o mesmo tom seguro independente de estar certa ou errada. Por isso vale sempre revisar dados, números e informações específicas.",
+            "Não. A IA não pensa — ela reconhece padrões e prevê sequências de palavras. O resultado parece inteligente, mas o processo é bem diferente do raciocínio humano.",
+          ],
+        },
+        {
+          text: "O que é um prompt?",
+          options: [
+            'O modelo de IA (o "cérebro" treinado)',
+            "A empresa que criou o Claude",
+            "A mensagem que você envia para a IA",
+          ],
+          correct: 2,
+          feedbacks: [
+            "Isso é o modelo — o sistema treinado com grandes volumes de dados. O prompt é outra coisa.",
+            "A empresa que criou o Claude é a Anthropic. O prompt é o seu comando — a mensagem que você escreve para a IA.",
+            "Isso mesmo! Prompt é a mensagem que você envia para a IA. É o seu principal meio de comunicação com a ferramenta — e quanto mais claro e específico, melhor a resposta.",
+          ],
+        },
+      ]
 
-</div>
+      let current = 0
+      let answers = []
+      let answered = false
 
-<script>
-const QUESTIONS = [
-  {
-    text: "A IA pode dar respostas diferentes para o mesmo prompt. Isso acontece porque…",
-    options: [
-      "ela aprende com cada conversa",
-      "ela trabalha com probabilidades",
-      "ela tem humor variável"
-    ],
-    correct: 1,
-    feedbacks: [
-      "Não exatamente. A IA não guarda memória entre conversas diferentes — cada sessão começa do zero.",
-      "Isso mesmo! A IA não tem uma resposta certa guardada — ela prevê a próxima palavra com base em probabilidades, e pode seguir caminhos diferentes a cada vez.",
-      "Não — a IA não tem estados emocionais. O que muda é o caminho probabilístico que ela segue ao gerar a resposta."
-    ]
-  },
-  {
-    text: "Qual dessas afirmações sobre a IA é verdadeira?",
-    options: [
-      "Ela sempre avisa quando erra",
-      "Ela gera respostas com a mesma confiança, certas ou não",
-      "Ela pensa como um humano"
-    ],
-    correct: 1,
-    feedbacks: [
-      "Na verdade, não. A IA não sabe que errou — ela gera a resposta mais provável sem avaliar se está correta.",
-      "Exatamente. A IA responde com o mesmo tom seguro independente de estar certa ou errada. Por isso vale sempre revisar dados, números e informações específicas.",
-      "Não. A IA não pensa — ela reconhece padrões e prevê sequências de palavras. O resultado parece inteligente, mas o processo é bem diferente do raciocínio humano."
-    ]
-  },
-  {
-    text: "O que é um prompt?",
-    options: [
-      "O modelo de IA (o \"cérebro\" treinado)",
-      "A empresa que criou o Claude",
-      "A mensagem que você envia para a IA"
-    ],
-    correct: 2,
-    feedbacks: [
-      "Isso é o modelo — o sistema treinado com grandes volumes de dados. O prompt é outra coisa.",
-      "A empresa que criou o Claude é a Anthropic. O prompt é o seu comando — a mensagem que você escreve para a IA.",
-      "Isso mesmo! Prompt é a mensagem que você envia para a IA. É o seu principal meio de comunicação com a ferramenta — e quanto mais claro e específico, melhor a resposta."
-    ]
-  }
-];
+      function render() {
+        const qa = document.getElementById("quiz-area")
+        const res = document.getElementById("result-area")
 
-let current = 0;
-let answers = [];
-let answered = false;
+        if (current >= QUESTIONS.length) {
+          qa.innerHTML = ""
+          showResult()
+          return
+        }
 
-function render() {
-  const qa = document.getElementById('quiz-area');
-  const res = document.getElementById('result-area');
+        res.classList.remove("visible")
+        answered = false
 
-  if (current >= QUESTIONS.length) {
-    qa.innerHTML = '';
-    showResult();
-    return;
-  }
+        const q = QUESTIONS[current]
+        const letters = ["a", "b", "c"]
+        const pct = Math.round((current / QUESTIONS.length) * 100)
+        document.getElementById("progress-fill").style.width = pct + "%"
+        document.getElementById("progress-label").textContent =
+          current + " / " + QUESTIONS.length
 
-  res.classList.remove('visible');
-  answered = false;
-
-  const q = QUESTIONS[current];
-  const letters = ['a', 'b', 'c'];
-  const pct = Math.round((current / QUESTIONS.length) * 100);
-  document.getElementById('progress-fill').style.width = pct + '%';
-  document.getElementById('progress-label').textContent = current + ' / ' + QUESTIONS.length;
-
-  let optHtml = '';
-  q.options.forEach((opt, i) => {
-    optHtml += `
+        let optHtml = ""
+        q.options.forEach((opt, i) => {
+          optHtml += `
       <button class="option" id="opt-${i}" onclick="choose(${i})">
         <span class="opt-letter">${letters[i]}</span>
         <span class="opt-text">${opt}</span>
         <span class="opt-icon" id="icon-${i}"></span>
-      </button>`;
-  });
+      </button>`
+        })
 
-  qa.innerHTML = `
+        qa.innerHTML = `
     <div class="question-card" id="q-card">
       <span class="q-number">Pergunta ${current + 1} de ${QUESTIONS.length}</span>
       <p class="q-text">${q.text}</p>
@@ -495,88 +544,102 @@ function render() {
       <div class="feedback" id="feedback"></div>
     </div>
     <button class="next-btn" id="next-btn" onclick="nextQ()">
-      ${current < QUESTIONS.length - 1 ? 'Próxima pergunta →' : 'Ver resultado →'}
-    </button>`;
-}
+      ${current < QUESTIONS.length - 1 ? "Próxima pergunta →" : "Ver resultado →"}
+    </button>`
+      }
 
-function choose(idx) {
-  if (answered) return;
-  answered = true;
+      function choose(idx) {
+        if (answered) return
+        answered = true
 
-  const q = QUESTIONS[current];
-  const isCorrect = idx === q.correct;
-  answers.push(isCorrect);
+        const q = QUESTIONS[current]
+        const isCorrect = idx === q.correct
+        answers.push(isCorrect)
 
-  const opts = document.querySelectorAll('.option');
-  opts.forEach((opt, i) => {
-    opt.disabled = true;
-    if (i === q.correct) {
-      opt.classList.add('correct');
-      document.getElementById('icon-' + i).textContent = '✓';
-    } else if (i === idx && !isCorrect) {
-      opt.classList.add('wrong');
-      document.getElementById('icon-' + i).textContent = '✗';
-    } else {
-      opt.classList.add('dimmed');
-    }
-  });
+        const opts = document.querySelectorAll(".option")
+        opts.forEach((opt, i) => {
+          opt.disabled = true
+          if (i === q.correct) {
+            opt.classList.add("correct")
+            document.getElementById("icon-" + i).textContent = "✓"
+          } else if (i === idx && !isCorrect) {
+            opt.classList.add("wrong")
+            document.getElementById("icon-" + i).textContent = "✗"
+          } else {
+            opt.classList.add("dimmed")
+          }
+        })
 
-  const fb = document.getElementById('feedback');
-  fb.className = 'feedback ' + (isCorrect ? 'correct' : 'wrong');
-  fb.innerHTML = `<span class="feedback-icon">${isCorrect ? '✓' : '✗'}</span>${q.feedbacks[idx]}`;
+        const fb = document.getElementById("feedback")
+        fb.className = "feedback " + (isCorrect ? "correct" : "wrong")
+        fb.innerHTML = `<span class="feedback-icon">${isCorrect ? "✓" : "✗"}</span>${q.feedbacks[idx]}`
 
-  document.getElementById('next-btn').classList.add('visible');
-}
+        document.getElementById("next-btn").classList.add("visible")
+      }
 
-function nextQ() {
-  current++;
-  render();
-  document.getElementById('progress-fill').style.width = Math.round((current / QUESTIONS.length) * 100) + '%';
-  document.getElementById('progress-label').textContent = current + ' / ' + QUESTIONS.length;
-}
+      function nextQ() {
+        current++
+        render()
+        document.getElementById("progress-fill").style.width =
+          Math.round((current / QUESTIONS.length) * 100) + "%"
+        document.getElementById("progress-label").textContent =
+          current + " / " + QUESTIONS.length
+      }
 
-function showResult() {
-  document.getElementById('progress-fill').style.width = '100%';
-  document.getElementById('progress-label').textContent = '3 / 3';
+      function showResult() {
+        document.getElementById("progress-fill").style.width = "100%"
+        document.getElementById("progress-label").textContent = "3 / 3"
 
-  const score = answers.filter(Boolean).length;
-  const total = QUESTIONS.length;
+        const score = answers.filter(Boolean).length
+        const total = QUESTIONS.length
 
-  const msgs = {
-    3: { title: "Tudo certo!", body: "Você entendeu como a IA funciona — e isso já te coloca à frente da maioria. Nas próximas aulas, vamos usar esse entendimento para extrair resultados muito melhores do Claude." },
-    2: { title: "Quase lá!", body: "Você pegou o essencial. Releia o trecho da aula sobre o ponto que errou — vai fazer ainda mais sentido agora que você tentou responder." },
-    1: { title: "Vale rever!", body: "Sem problema nenhum — o conteúdo é novo. Releia a aula com calma e tente o quiz de novo. Cada releitura fixa mais." },
-    0: { title: "Recomeçar ajuda!", body: "Acontece. Volte ao conteúdo da aula com calma e tente de novo — o quiz estará aqui." }
-  };
+        const msgs = {
+          3: {
+            title: "Tudo certo!",
+            body: "Você entendeu como a IA funciona — e isso já te coloca à frente da maioria. Nas próximas aulas, vamos usar esse entendimento para extrair resultados muito melhores do Claude.",
+          },
+          2: {
+            title: "Quase lá!",
+            body: "Você pegou o essencial. Releia o trecho da aula sobre o ponto que errou — vai fazer ainda mais sentido agora que você tentou responder.",
+          },
+          1: {
+            title: "Vale rever!",
+            body: "Sem problema nenhum — o conteúdo é novo. Releia a aula com calma e tente o quiz de novo. Cada releitura fixa mais.",
+          },
+          0: {
+            title: "Recomeçar ajuda!",
+            body: "Acontece. Volte ao conteúdo da aula com calma e tente de novo — o quiz estará aqui.",
+          },
+        }
 
-  const m = msgs[score];
+        const m = msgs[score]
 
-  let dotsHtml = '';
-  answers.forEach(a => {
-    dotsHtml += `<div class="dot ${a ? 'correct' : 'wrong'}"></div>`;
-  });
+        let dotsHtml = ""
+        answers.forEach((a) => {
+          dotsHtml += `<div class="dot ${a ? "correct" : "wrong"}"></div>`
+        })
 
-  const res = document.getElementById('result-area');
-  res.innerHTML = `
+        const res = document.getElementById("result-area")
+        res.innerHTML = `
     <div class="result-score">${score}/${total}</div>
     <div class="result-label">respostas corretas</div>
     <div class="dots-row">${dotsHtml}</div>
     <p class="result-msg"><strong>${m.title}</strong> ${m.body}</p>
-    <button class="retry-btn" onclick="restart()">↺ Tentar novamente</button>`;
-  res.classList.add('visible');
-}
+    <button class="retry-btn" onclick="restart()">↺ Tentar novamente</button>`
+        res.classList.add("visible")
+      }
 
-function restart() {
-  current = 0;
-  answers = [];
-  answered = false;
-  document.getElementById('progress-fill').style.width = '0%';
-  document.getElementById('progress-label').textContent = '0 / 3';
-  document.getElementById('result-area').classList.remove('visible');
-  render();
-}
+      function restart() {
+        current = 0
+        answers = []
+        answered = false
+        document.getElementById("progress-fill").style.width = "0%"
+        document.getElementById("progress-label").textContent = "0 / 3"
+        document.getElementById("result-area").classList.remove("visible")
+        render()
+      }
 
-render();
-</script>
-</body>
+      render()
+    </script>
+  </body>
 </html>
