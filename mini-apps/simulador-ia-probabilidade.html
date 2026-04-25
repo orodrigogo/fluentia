@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Como a IA funciona: do prompt à resposta</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg-2: #f7f6f3;
+    --bg-3: #f0ede8;
+    --text: #1a1a18;
+    --text-2: #5a5a56;
+    --text-3: #9a9a94;
+    --border: rgba(0,0,0,0.10);
+    --border-2: rgba(0,0,0,0.18);
+    --purple-fill: #EEEDFE;
+    --purple-border: #AFA9EC;
+    --purple-text: #3C3489;
+    --teal-fill: #E1F5EE;
+    --teal-border: #5DCAA5;
+    --teal-text: #0F6E56;
+    --amber-fill: #FAEEDA;
+    --amber-border: #EF9F27;
+    --amber-text: #854F0B;
+    --accent: #534AB7;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-pill: 999px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a;
+      --bg-2: #242420;
+      --bg-3: #2c2c28;
+      --text: #f0ede8;
+      --text-2: #a0a09a;
+      --text-3: #606060;
+      --border: rgba(255,255,255,0.10);
+      --border-2: rgba(255,255,255,0.18);
+      --purple-fill: #26215C;
+      --purple-border: #7F77DD;
+      --purple-text: #CECBF6;
+      --teal-fill: #04342C;
+      --teal-border: #1D9E75;
+      --teal-text: #9FE1CB;
+      --amber-fill: #412402;
+      --amber-border: #BA7517;
+      --amber-text: #FAC775;
+      --accent: #7F77DD;
+    }
+  }
+
+  body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 620px;
+  }
+
+  .header {
+    margin-bottom: 1.75rem;
+  }
+
+  .header h1 {
+    font-size: 13px;
+    font-family: 'Courier New', monospace;
+    font-weight: 400;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .header p {
+    font-size: 15px;
+    color: var(--text-2);
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  /* Prompt input */
+  .prompt-section { margin-bottom: 1.25rem; }
+
+  .field-label {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .prompt-input {
+    flex: 1;
+    font-family: 'Georgia', serif;
+    font-size: 15px;
+    color: var(--text);
+    background: var(--bg-2);
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .prompt-input:focus { border-color: var(--accent); }
+  .prompt-input::placeholder { color: var(--text-3); font-style: italic; }
+
+  .run-btn {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--bg);
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 10px 18px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .run-btn:hover { opacity: 0.88; }
+  .run-btn:active { transform: scale(0.97); }
+
+  .examples-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  .ex-pill {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    padding: 4px 11px;
+    border-radius: var(--radius-pill);
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .ex-pill:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Pipeline */
+  .pipeline {
+    display: flex;
+    align-items: flex-start;
+    margin: 1.5rem 0;
+    position: relative;
+  }
+
+  .pipeline::before {
+    content: '';
+    position: absolute;
+    top: 22px;
+    left: 22px;
+    right: 22px;
+    height: 1px;
+    background: var(--border-2);
+    z-index: 0;
+  }
+
+  .pipe-step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .pipe-dot {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--border-2);
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: background 0.35s, border-color 0.35s;
+  }
+
+  .pipe-dot.active {
+    background: var(--purple-fill);
+    border-color: var(--purple-border);
+    animation: pulse 0.6s ease;
+  }
+
+  .pipe-dot.done {
+    background: var(--teal-fill);
+    border-color: var(--teal-border);
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(0.9); }
+    60% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+
+  .pipe-label {
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    color: var(--text-3);
+    text-align: center;
+    line-height: 1.4;
+    max-width: 72px;
+    transition: color 0.3s;
+  }
+
+  .pipe-label.active { color: var(--purple-text); }
+  .pipe-label.done { color: var(--teal-text); }
+
+  /* Probability bars */
+  .probs-section {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+    min-height: 68px;
+    transition: opacity 0.3s;
+  }
+
+  .probs-empty {
+    font-family: 'Georgia', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--text-3);
+  }
+
+  .prob-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 9px;
+  }
+  .prob-row:last-child { margin-bottom: 0; }
+
+  .prob-word {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: var(--text);
+    min-width: 100px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .prob-badge {
+    font-size: 9px;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.05em;
+    padding: 2px 7px;
+    border-radius: var(--radius-pill);
+    background: var(--teal-fill);
+    color: var(--teal-text);
+    border: 1px solid var(--teal-border);
+    white-space: nowrap;
+  }
+
+  .bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: var(--bg-3);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .prob-pct {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: var(--text-3);
+    min-width: 30px;
+    text-align: right;
+  }
+
+  /* Response */
+  .response-section { margin-bottom: 1.25rem; }
+
+  .response-box {
+    background: var(--bg);
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    min-height: 52px;
+  }
+
+  .response-text {
+    font-family: 'Georgia', serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .response-placeholder {
+    font-style: italic;
+    color: var(--text-3);
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1.1em;
+    background: var(--accent);
+    vertical-align: middle;
+    margin-left: 1px;
+    animation: blink 0.75s steps(1) infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .retry-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+
+  .retry-btn {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--text-2);
+    background: transparent;
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius-pill);
+    padding: 5px 14px;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+    display: none;
+  }
+  .retry-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Note */
+  .note {
+    font-family: 'Georgia', serif;
+    font-size: 13px;
+    font-style: italic;
+    color: var(--text-2);
+    line-height: 1.65;
+    border-left: 2px solid var(--purple-border);
+    padding: 10px 14px;
+    background: var(--purple-fill);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    display: none;
+  }
+
+  .note strong { font-style: normal; color: var(--purple-text); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Simulador · Como a IA funciona</h1>
+    <p>Escreva o início de uma frase e veja como a IA calcula probabilidades para gerar a resposta.</p>
+  </div>
+
+  <div class="prompt-section">
+    <span class="field-label">Seu prompt</span>
+    <div class="input-row">
+      <input class="prompt-input" id="prompt-input" type="text" placeholder="Hoje o céu está…" value="Hoje o céu está" />
+      <button class="run-btn" onclick="runSim()">Simular →</button>
+    </div>
+    <div class="examples-row">
+      <span class="ex-pill" onclick="setEx('Hoje o céu está')">Hoje o céu está</span>
+      <span class="ex-pill" onclick="setEx('O café estava')">O café estava</span>
+      <span class="ex-pill" onclick="setEx('A reunião foi')">A reunião foi</span>
+      <span class="ex-pill" onclick="setEx('O cliente ficou')">O cliente ficou</span>
+    </div>
+  </div>
+
+  <div class="pipeline" id="pipeline">
+    <div class="pipe-step">
+      <div class="pipe-dot" id="dot-0">✏️</div>
+      <div class="pipe-label" id="lbl-0">Você escreve o prompt</div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-dot" id="dot-1">🔍</div>
+      <div class="pipe-label" id="lbl-1">IA analisa padrões</div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-dot" id="dot-2">🎲</div>
+      <div class="pipe-label" id="lbl-2">Calcula probabilidades</div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-dot" id="dot-3">💬</div>
+      <div class="pipe-label" id="lbl-3">Gera a resposta</div>
+    </div>
+  </div>
+
+  <span class="field-label">Próximas palavras mais prováveis</span>
+  <div class="probs-section" id="probs-section">
+    <div class="probs-empty" id="probs-empty">Clique em "Simular" para ver as probabilidades.</div>
+    <div id="probs-bars"></div>
+  </div>
+
+  <div class="response-section">
+    <span class="field-label">Resposta gerada</span>
+    <div class="response-box">
+      <span class="response-text" id="response-text">
+        <span class="response-placeholder">A resposta aparecerá aqui, palavra por palavra…</span>
+      </span>
+    </div>
+    <div class="retry-row">
+      <button class="retry-btn" id="retry-btn" onclick="retryDifferent()">↺ Gerar resposta diferente</button>
+    </div>
+  </div>
+
+  <div class="note" id="note">
+    <strong>Por que a resposta pode mudar?</strong> A IA não tem uma resposta "certa" guardada. Ela escolhe entre as palavras mais prováveis — e pode seguir caminhos diferentes a cada vez. Tente clicar em <em>Gerar resposta diferente</em> para ver isso na prática.
+  </div>
+
+</div>
+
+<script>
+const BAR_COLORS = ["#534AB7","#7F77DD","#AFA9EC","#CECBF6","#EEEDFE"];
+const BAR_COLORS_DARK = ["#7F77DD","#AFA9EC","#CECBF6","#534AB7","#26215C"];
+
+const DB = {
+  "Hoje o céu está": {
+    words: [
+      { w: "azul", p: 38 },
+      { w: "nublado", p: 28 },
+      { w: "limpo", p: 18 },
+      { w: "cinza", p: 10 },
+      { w: "lindo", p: 6 }
+    ],
+    continuations: [
+      "azul, com algumas nuvens no horizonte e uma brisa agradável.",
+      "nublado, mas a previsão indica sol para o fim da tarde.",
+      "limpo e ensolarado — um dia perfeito para estar ao ar livre.",
+      "azul e sem nuvens, o tempo ideal para um passeio.",
+      "nublado e o ar está um pouco úmido nesta manhã."
+    ]
+  },
+  "O café estava": {
+    words: [
+      { w: "quente", p: 35 },
+      { w: "frio", p: 25 },
+      { w: "forte", p: 20 },
+      { w: "amargo", p: 13 },
+      { w: "ótimo", p: 7 }
+    ],
+    continuations: [
+      "quente e perfumado, exatamente como eu gosto de manhã.",
+      "frio — alguém havia esquecido a xícara na mesa por horas.",
+      "forte demais para o meu gosto, mas o aroma compensou.",
+      "quente e forte, o começo perfeito para um dia agitado.",
+      "frio e sem graça, típico de uma longa reunião."
+    ]
+  },
+  "A reunião foi": {
+    words: [
+      { w: "produtiva", p: 33 },
+      { w: "longa", p: 27 },
+      { w: "cancelada", p: 20 },
+      { w: "rápida", p: 14 },
+      { w: "difícil", p: 6 }
+    ],
+    continuations: [
+      "produtiva e encerramos com todos os pontos alinhados.",
+      "longa, mas valeu — saímos com um plano claro de ação.",
+      "cancelada de última hora, o que liberou a tarde para outras tarefas.",
+      "rápida e objetiva, como toda boa reunião deveria ser.",
+      "produtiva, apesar da agenda apertada e dos imprevistos do dia."
+    ]
+  },
+  "O cliente ficou": {
+    words: [
+      { w: "satisfeito", p: 40 },
+      { w: "surpreso", p: 25 },
+      { w: "feliz", p: 20 },
+      { w: "em dúvida", p: 10 },
+      { w: "animado", p: 5 }
+    ],
+    continuations: [
+      "satisfeito com o resultado e já sinalizou interesse em um novo projeto.",
+      "surpreso com a velocidade da entrega — esperava pelo menos mais uma semana.",
+      "feliz com a proposta e pediu para avançar com o contrato.",
+      "satisfeito e deixou um depoimento positivo espontaneamente.",
+      "surpreso e empolgado com as possibilidades que apresentamos."
+    ]
+  }
+};
+
+function getClosest(prompt) {
+  const keys = Object.keys(DB);
+  for (let k of keys) {
+    if (prompt.toLowerCase().includes(k.toLowerCase().slice(0, 8))) return DB[k];
+  }
+  return DB["Hoje o céu está"];
+}
+
+function setEx(v) {
+  document.getElementById('prompt-input').value = v;
+}
+
+function isDark() {
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+function setStage(stage) {
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById('dot-' + i);
+    const lbl = document.getElementById('lbl-' + i);
+    dot.className = 'pipe-dot' + (i < stage ? ' done' : i === stage ? ' active' : '');
+    lbl.className = 'pipe-label' + (i < stage ? ' done' : i === stage ? ' active' : '');
+  }
+}
+
+function showProbs(data) {
+  const colors = isDark() ? BAR_COLORS_DARK : BAR_COLORS;
+  const max = data.words[0].p;
+  document.getElementById('probs-empty').style.display = 'none';
+  let html = '';
+  data.words.forEach((w, i) => {
+    const pct = Math.round(w.p);
+    const width = Math.round((w.p / max) * 100);
+    const badge = i === 0 ? '<span class="prob-badge">mais provável</span>' : '';
+    html += `<div class="prob-row">
+      <span class="prob-word">${w.w}${badge}</span>
+      <div class="bar-wrap"><div class="bar-fill" style="width:0%;background:${colors[i]};"></div></div>
+      <span class="prob-pct">${pct}%</span>
+    </div>`;
+  });
+  document.getElementById('probs-bars').innerHTML = html;
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.bar-fill').forEach((bar, i) => {
+      const width = Math.round((data.words[i].p / max) * 100);
+      setTimeout(() => { bar.style.width = width + '%'; }, i * 80);
+    });
+  });
+}
+
+let currentData = null;
+
+function typeResponse(data) {
+  const idx = Math.floor(Math.random() * data.continuations.length);
+  const full = data.continuations[idx];
+  const words = full.split(' ');
+  const el = document.getElementById('response-text');
+  el.innerHTML = '<span class="cursor"></span>';
+  let i = 0;
+  function next() {
+    if (i < words.length) {
+      el.innerHTML = words.slice(0, i + 1).join(' ') + ' <span class="cursor"></span>';
+      i++;
+      setTimeout(next, 85 + Math.random() * 65);
+    } else {
+      el.innerHTML = full;
+      document.getElementById('retry-btn').style.display = 'inline-block';
+      document.getElementById('note').style.display = 'block';
+      setStage(4);
+    }
+  }
+  next();
+}
+
+function runSim() {
+  const prompt = document.getElementById('prompt-input').value.trim();
+  if (!prompt) return;
+  currentData = getClosest(prompt);
+
+  document.getElementById('retry-btn').style.display = 'none';
+  document.getElementById('note').style.display = 'none';
+  document.getElementById('probs-bars').innerHTML = '';
+  document.getElementById('probs-empty').style.display = 'block';
+  document.getElementById('probs-empty').textContent = 'Analisando padrões…';
+  document.getElementById('response-text').innerHTML = '<span class="response-placeholder">Gerando resposta…</span>';
+
+  setStage(0);
+  setTimeout(() => setStage(1), 400);
+  setTimeout(() => { setStage(2); showProbs(currentData); }, 1000);
+  setTimeout(() => { setStage(3); typeResponse(currentData); }, 2300);
+}
+
+function retryDifferent() {
+  if (!currentData) return;
+  document.getElementById('retry-btn').style.display = 'none';
+  document.getElementById('note').style.display = 'none';
+  document.getElementById('response-text').innerHTML = '<span class="response-placeholder">Gerando caminho diferente…</span>';
+  setStage(3);
+  setTimeout(() => typeResponse(currentData), 400);
+}
+
+document.getElementById('prompt-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') runSim();
+});
+</script>
+</body>
+</html>
